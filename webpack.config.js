@@ -38,11 +38,11 @@ module.exports = {
         'Copyright ' + new Date().getFullYear() + ', ' + pkg.author,
         pkg.license +' license'
     ].join('\n'))
-    ,new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      }
-    })
+    // ,new webpack.optimize.UglifyJsPlugin({
+    //   compress: {
+    //     warnings: false
+    //   }
+    // })
     // ,new ExtractTextPlugin('[name].min.css') // 将css独立打包
   ]
 

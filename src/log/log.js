@@ -36,6 +36,7 @@ class VConsoleLogTab extends VConsolePlugin {
    */
   onInit() {
     this.$tabbox = $.render(this.tplTabbox, {});
+    this.$vclog = $.one('.vc-log', this.$tabbox);
   }
 
   /**
@@ -314,15 +315,18 @@ class VConsoleLogTab extends VConsolePlugin {
       item.meta = date.hour + ':' + date.minute + ':' + date.second;
     }
 
+    console.time('$.render(tplItem' + logs[0]);
     // create line
-    let $line = $.render(tplItem, {
-      logType: item.logType,
-      noMeta: !!item.noMeta,
-      meta: item.meta,
-      style: item.style || ''
-    });
+    // let $line = $.render(tplItem, {
+    //   logType: item.logType,
+    //   noMeta: !!item.noMeta,
+    //   meta: item.meta,
+    //   style: item.style || ''
+    // });
 
-    let $content = $.one('.vc-item-content', $line);
+    // let $content = $.one('.vc-item-content', $line);
+    // console.timeEnd('$.render(tplItem' + logs[0]);
+
     // generate content from item.logs
     for (let i=0; i<logs.length; i++) {
       let log;
@@ -338,18 +342,38 @@ class VConsoleLogTab extends VConsolePlugin {
           log = this.getFoldedLine(logs[i]);
         } else {
           // default
-          log = '<span> ' + tool.htmlEncode(logs[i]).replace(/\n/g, '<br/>') + '</span>';
+          log = tool.htmlEncode(logs[i]).replace(/\n/g, '<br/>');
         }
       } catch (e) {
-        log = '<span> [' + (typeof logs[i]) + ']</span>';
+        log = (typeof logs[i]);
       }
       if (log) {
-        if (typeof log === 'string')
-          $content.insertAdjacentHTML('beforeend', log);
-        else
-          $content.insertAdjacentElement('beforeend', log);
+        var itemTpl = '<div class="vc-item vc-item-' + item.logType + '">';
+        if (item.noMeta) {
+            itemTpl += '<span class="vc-item-meta">{{if (!noMeta)}}{{meta}}{{/if}}</span>';
+        }
+        itemTpl += '<div class="vc-item-content">' + log + '</div>'
+        /**
+        if (typeof log === 'string') {
+          // $content.insertAdjacentHTML('beforeend', log);
+          itemTpl += '<div class="vc-item-content">' + log + '</div>'
+        } else {
+          // $content.insertAdjacentElement('beforeend', log);
+          itemTpl += '<div class="vc-item-content">' + log + '</div>'
+          itemTpl += '</div>';
+        }
+        */
+        itemTpl += '</div>';
+        // $content.insertAdjacentHTML('beforeend', log);
+        if (this.$vclog.childNodes.length > 300) {
+            for (var i = 0; i < 50; i++) {
+                this.$vclog.childNodes[i] && this.$vclog.removeChild(this.$vclog.childNodes[i]);
+            }
+        }
+        this.$vclog.insertAdjacentHTML('beforeend', itemTpl);
       }
     }
+    
 
     // generate content from item.content
     if (tool.isObject(item.content)) {
@@ -357,7 +381,8 @@ class VConsoleLogTab extends VConsolePlugin {
     }
 
     // render to panel
-    $.one('.vc-log', this.$tabbox).insertAdjacentElement('beforeend', $line);
+    // var $vclog = $.one('.vc-log', this.$tabbox);
+    // $vclog.insertAdjacentElement('beforeend', $line); 
 
     // scroll to bottom if it is in the bottom before
     if (this.isInBottom) {

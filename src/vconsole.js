@@ -10,7 +10,7 @@ import VConsolePlugin from './lib/plugin.js';
 // built-in tabs
 import VConsoleDefaultTab from './log/default.js';
 import VConsoleSystemTab from './log/system.js';
-import VConsoleNetworkTab from './network/network.js';
+// import VConsoleNetworkTab from './network/network.js';
 
 // here we go
 const vConsole = new VConsole();

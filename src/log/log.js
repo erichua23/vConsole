@@ -26,6 +26,9 @@ class VConsoleLogTab extends VConsolePlugin {
     this.logList = [];
     this.isInBottom = true; // whether the panel is in the bottom
 
+    this.insertBuffer = [];
+    this.bufferSize = 10;
+
     this.mockConsole();
   }
 
@@ -383,7 +386,13 @@ class VConsoleLogTab extends VConsolePlugin {
             this.$vclog.childNodes[i] && this.$vclog.removeChild(this.$vclog.childNodes[i]);
         }
     }
-    this.$vclog.insertAdjacentHTML('beforeend', logItemHTML);
+
+    if (this.insertBuffer.length < this.bufferSize) {
+        this.insertBuffer.push(logItemHTML);
+    } else {
+        this.$vclog.insertAdjacentHTML('beforeend', this.insertBuffer.join(''));
+        this.insertBuffer = [];
+    }
   }
 
   getItemHtml(item, log) {

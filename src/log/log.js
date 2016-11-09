@@ -258,6 +258,7 @@ class VConsoleLogTab extends VConsolePlugin {
    * @param  string  meta
    */
   printLog(item) {
+    let that = this;
     let logs = item.logs || [];
     if (!logs.length && !item.content) {
       return;
@@ -315,65 +316,44 @@ class VConsoleLogTab extends VConsolePlugin {
       item.meta = date.hour + ':' + date.minute + ':' + date.second;
     }
 
-    console.time('$.render(tplItem' + logs[0]);
-    // create line
-    // let $line = $.render(tplItem, {
-    //   logType: item.logType,
-    //   noMeta: !!item.noMeta,
-    //   meta: item.meta,
-    //   style: item.style || ''
-    // });
-
-    // let $content = $.one('.vc-item-content', $line);
-    // console.timeEnd('$.render(tplItem' + logs[0]);
-
-    // generate content from item.logs
-    for (let i=0; i<logs.length; i++) {
-      let log;
-      try {
-        if (logs[i] === '') {
-          // ignore empty string
-          continue;
-        } else if (tool.isFunction(logs[i])) {
-          // convert function to string
-          log = '<span> ' + logs[i].toString() + '</span>';
-        } else if (tool.isObject(logs[i]) || tool.isArray(logs[i])) {
-          // object or array
-          log = this.getFoldedLine(logs[i]);
+    let log;
+    // FIXME
+    var useTextLog = true;
+    if (useTextLog) {
+        let log;
+        if (tool.isArray(logs) && logs.length == 1 && tool.isString(logs[0])) {
+          log = logs[0];
         } else {
-          // default
-          log = tool.htmlEncode(logs[i]).replace(/\n/g, '<br/>');
+          log = JSON.stringify(logs);
         }
-      } catch (e) {
-        log = (typeof logs[i]);
-      }
-      if (log) {
-        var itemTpl = '<div class="vc-item vc-item-' + item.logType + '">';
-        if (item.noMeta) {
-            itemTpl += '<span class="vc-item-meta">{{if (!noMeta)}}{{meta}}{{/if}}</span>';
+        var logItemHTML = that.getItemHtml(item, log);
+        that.appendLogItem(logItemHTML);
+    } else {
+      // generate content from item.logs
+      for (let i=0; i<logs.length; i++) {
+        try {
+          if (logs[i] === '') {
+            // ignore empty string
+            continue;
+          } else if (tool.isFunction(logs[i])) {
+            // convert function to string
+            log = '<span> ' + logs[i].toString() + '</span>';
+          } else if (tool.isObject(logs[i]) || tool.isArray(logs[i])) {
+            // object or array
+            log = this.getFoldedLine(logs[i]);
+          } else {
+            // default
+            log = tool.htmlEncode(logs[i]).replace(/\n/g, '<br/>');
+          }
+        } catch (e) {
+          log = (typeof logs[i]);
         }
-        itemTpl += '<div class="vc-item-content">' + log + '</div>'
-        /**
-        if (typeof log === 'string') {
-          // $content.insertAdjacentHTML('beforeend', log);
-          itemTpl += '<div class="vc-item-content">' + log + '</div>'
-        } else {
-          // $content.insertAdjacentElement('beforeend', log);
-          itemTpl += '<div class="vc-item-content">' + log + '</div>'
-          itemTpl += '</div>';
+        if (log) {
+          var logItemHTML = that.getItemHtml(item, log);
+          that.appendLogItem(logItemHTML);
         }
-        */
-        itemTpl += '</div>';
-        // $content.insertAdjacentHTML('beforeend', log);
-        if (this.$vclog.childNodes.length > 300) {
-            for (var i = 0; i < 50; i++) {
-                this.$vclog.childNodes[i] && this.$vclog.removeChild(this.$vclog.childNodes[i]);
-            }
-        }
-        this.$vclog.insertAdjacentHTML('beforeend', itemTpl);
       }
     }
-    
 
     // generate content from item.content
     if (tool.isObject(item.content)) {
@@ -393,6 +373,31 @@ class VConsoleLogTab extends VConsolePlugin {
     if (!item.noOrigin) {
       this.printOriginLog(item);
     }
+  }
+  /**
+   * controler max log limit
+   */
+  appendLogItem(logItemHTML) {
+    if (this.$vclog.childNodes.length > 1000) {
+        for (var i = 0; i < 100; i++) {
+            this.$vclog.childNodes[i] && this.$vclog.removeChild(this.$vclog.childNodes[i]);
+        }
+    }
+    this.$vclog.insertAdjacentHTML('beforeend', logItemHTML);
+  }
+
+  getItemHtml(item, log) {
+    var itemTpl = '<div class="vc-item vc-item-' + item.logType + '">';
+    if (item.noMeta) {
+        itemTpl += '<span class="vc-item-meta">' + item.meta + '</span>';
+    }
+    if (typeof log === 'string') {
+      itemTpl += '<div class="vc-item-content">' + log + '</div>'
+    } else {
+      itemTpl += '<div class="vc-item-content">' + log.outerHTML + '</div>'
+    }
+    itemTpl += '</div>';
+    return itemTpl;
   }
 
   /**

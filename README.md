@@ -67,11 +67,24 @@ Plugin:
  - [vConsole-resources](https://github.com/WechatFE/vConsole-resources)
  - [vConsole-sources](https://github.com/WechatFE/vConsole-sources)
  - [vConsole-elements](https://github.com/WechatFE/vConsole-elements)
+ - [vconsole-webpack-plugin](https://github.com/diamont1001/vconsole-webpack-plugin)
+
+
+## CDN
+
+- [v2.5.1](https://res.wx.qq.com/mmbizwap/zh_CN/htmledition/js/vconsole/2.5.1/vconsole.min.js)
 
 
 ## Changelog
 
 [CHANGELOG.md](./CHANGELOG.md)
+
+
+## Feedback
+
+QQ Group: 497430533
+
+![](./example/snapshot/qq_group.png)
 
 
 ## License
